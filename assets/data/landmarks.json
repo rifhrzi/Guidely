@@ -1,0 +1,65 @@
+[
+  {
+    "id": "library",
+    "name": "Main Library",
+    "type": "library",
+    "lat": -6.2,
+    "lng": 106.816666
+  },
+  {
+    "id": "lecture_hall",
+    "name": "Central Lecture Hall",
+    "type": "class",
+    "lat": -6.2005,
+    "lng": 106.8171
+  },
+  {
+    "id": "prayer",
+    "name": "Campus Prayer Hall",
+    "type": "prayer",
+    "lat": -6.2009,
+    "lng": 106.8163
+  },
+  {
+    "id": "gedung_a_fkip",
+    "name": "Gedung A FKIP",
+    "type": "prodi",
+    "lat": -6.13015003221705,
+    "lng": 106.16475319142742
+  },
+  {
+    "id": "gedung_b_fkip",
+    "name": "Gedung B FKIP",
+    "type": "rektorat",
+    "lat": -6.130351600805545,
+    "lng": 106.16475681053558
+  },
+  {
+    "id": "gedung_c",
+    "name": "Gedung C",
+    "type": "kelas",
+    "lat": -6.130728796798473,
+    "lng": 106.1638784953349
+  },
+  {
+    "id": "kantin_fkip",
+    "name": "Kantin FKIP",
+    "type": "kantin",
+    "lat": -6.130513201851904,
+    "lng": 106.16463234468581
+  },
+  {
+    "id": "rusun_untirta",
+    "name": "Rusun Untirta",
+    "type": "asrama",
+    "lat": -6.130767011479724,
+    "lng": 106.16481455891326
+  },
+  {
+    "id": "masjid_fkip",
+    "name": "Masjid FKIP",
+    "type": "masjid",
+    "lat": -6.130529094457238,
+    "lng": 106.16504854212253
+  }
+]

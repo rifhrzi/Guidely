@@ -1,0 +1,24 @@
+{
+"type": "FeatureCollection",
+"name": "POI FKIP",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "nama": "Parkir 1", "kategori": "parkir", "lantai": 1, "aksesibel": true, "id": "G1" }, "geometry": { "type": "Point", "coordinates": [ 106.164815581704687, -6.130577952417205 ] } },
+{ "type": "Feature", "properties": { "nama": "Parkir Mobil", "kategori": "parkir", "lantai": 1, "aksesibel": true, "id": "G2" }, "geometry": { "type": "Point", "coordinates": [ 106.165319109794609, -6.130442629243039 ] } },
+{ "type": "Feature", "properties": { "nama": "Parkir Basement", "kategori": "parkir", "lantai": 1, "aksesibel": true, "id": "G3" }, "geometry": { "type": "Point", "coordinates": [ 106.163864779053625, -6.131131439934789 ] } },
+{ "type": "Feature", "properties": { "nama": "Gerbang Keluar", "kategori": "gerbang", "lantai": 1, "aksesibel": true, "id": "G4" }, "geometry": { "type": "Point", "coordinates": [ 106.165950486813557, -6.130403291111011 ] } },
+{ "type": "Feature", "properties": { "nama": "Gerbang Masuk", "kategori": "gerbang", "lantai": 1, "aksesibel": true, "id": "G5" }, "geometry": { "type": "Point", "coordinates": [ 106.164150373892113, -6.131679420113894 ] } },
+{ "type": "Feature", "properties": { "nama": "Gedung C", "kategori": "Pintu Masuk", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.163993489371379, -6.130697910202181 ] } },
+{ "type": "Feature", "properties": { "nama": "Exit Basement", "kategori": "pintu", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.164041477408389, -6.130409439813016 ] } },
+{ "type": "Feature", "properties": { "nama": "Lab Biologi", "kategori": "pintu", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.165729886208936, -6.130280588150793 ] } },
+{ "type": "Feature", "properties": { "nama": "Gedung B", "kategori": "pintu", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.164780064965569, -6.130239386572043 ] } },
+{ "type": "Feature", "properties": { "nama": "Gedung A", "kategori": "pintu", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.164770076704016, -6.130299940407471 ] } },
+{ "type": "Feature", "properties": { "nama": "Kantin FKIP", "kategori": "kantin", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.1646733154206, -6.130543404281876 ] } },
+{ "type": "Feature", "properties": { "nama": "Asrama", "kategori": "pintu", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.164841243067286, -6.130699470868037 ] } },
+{ "type": "Feature", "properties": { "nama": "Masjid FKIP", "kategori": "pintu", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.16507471868016, -6.130482226180102 ] } },
+{ "type": "Feature", "properties": { "nama": "Lab PKH", "kategori": "pintu", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.165620951731668, -6.130542780015531 ] } },
+{ "type": "Feature", "properties": { "nama": "Taman FKIP", "kategori": "taman", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.164375999031975, -6.130199637730807 ] } },
+{ "type": "Feature", "properties": { "nama": "Bengkel Vokasi", "kategori": "pintu", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.164030711251812, -6.130263186726419 ] } },
+{ "type": "Feature", "properties": { "nama": "Lapangan FKIP", "kategori": "outdoor", "lantai": 1, "aksesibel": true, "id": null }, "geometry": { "type": "Point", "coordinates": [ 106.164056306171943, -6.130115859869086 ] } }
+]
+}

@@ -1,0 +1,172 @@
+1: import 'package:flutter/material.dart';
+2: import '../map/campus_map_page.dart';
+3: import '../favorites/favorites_page.dart';
+4: import '../help/help_page.dart';
+5: import '../settings/settings_page.dart';
+6: import '../destination/voice_destination_page.dart';
+7: 
+8: class HomePage extends StatelessWidget {
+9:   const HomePage({super.key});
+10: 
+11:   @override
+12:   Widget build(BuildContext context) {
+13:     // Announcer is used in destination flow; not required here.
+14:     final scheme = Theme.of(context).colorScheme;
+15:     return Scaffold(
+16:       appBar: AppBar(
+17:         title: const Text('NavMate'),
+18:         actions: [
+19:           Semantics(
+20:             label: 'Campus Map',
+21:             button: true,
+22:             child: IconButton(
+23:               tooltip: 'Campus Map',
+24:               icon: const Icon(Icons.map),
+25:               onPressed: () {
+26:                 Navigator.of(context).push(
+27:                   MaterialPageRoute(builder: (_) => const CampusMapPage()),
+28:                 );
+29:               },
+30:             ),
+31:           ),
+32:           Semantics(
+33:             label: 'Settings',
+34:             button: true,
+35:             child: IconButton(
+36:               tooltip: 'Settings',
+37:               icon: const Icon(Icons.settings),
+38:               onPressed: () {
+39:                 Navigator.of(context).push(
+40:                   MaterialPageRoute(builder: (_) => const SettingsPage()),
+41:                 );
+42:               },
+43:             ),
+44:           ),
+45:         ],
+46:       ),
+47:       body: SafeArea(
+48:         child: SingleChildScrollView(
+49:           padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+50:           child: Column(
+51:             crossAxisAlignment: CrossAxisAlignment.stretch,
+52:             children: [
+53:               // Gradient header
+54:               Container(
+55:                 decoration: BoxDecoration(
+56:                   gradient: LinearGradient(
+57:                     colors: [
+58:                       scheme.primaryContainer,
+59:                       scheme.secondary.withValues(alpha: 0.6),
+60:                     ],
+61:                   ),
+62:                   borderRadius: BorderRadius.circular(16),
+63:                 ),
+64:                 padding: const EdgeInsets.all(20),
+65:                 child: Row(
+66:                   children: [
+67:                     Icon(Icons.navigation_rounded, size: 40, color: scheme.onPrimaryContainer),
+68:                     const SizedBox(width: 12),
+69:                     Expanded(
+70:                       child: Column(
+71:                         crossAxisAlignment: CrossAxisAlignment.start,
+72:                         children: [
+73:                           Text('Welcome to NavMate',
+74:                               style: Theme.of(context).textTheme.titleLarge?.copyWith(
+75:                                     color: scheme.onPrimaryContainer,
+76:                                     fontWeight: FontWeight.w700,
+77:                                   )),
+78:                           const SizedBox(height: 4),
+79:                           Text('Voice-first campus navigation',
+80:                               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+81:                                     color: scheme.onPrimaryContainer.withValues(alpha: 0.9),
+82:                                   )),
+83:                         ],
+84:                       ),
+85:                     ),
+86:                   ],
+87:                 ),
+88:               ),
+89:               const SizedBox(height: 20),
+90:               // Primary CTA
+91:               Semantics(
+92:                 button: true,
+93:                 label: 'Speak Destination',
+94:                 hint: 'Double tap to speak your destination',
+95:                 child: FilledButton.tonalIcon(
+96:                   onPressed: () {
+97:                     Navigator.of(context).push(
+98:                       MaterialPageRoute(builder: (_) => const VoiceDestinationPage()),
+99:                     );
+100:                   },
+101:                   icon: const Icon(Icons.mic, size: 28),
+102:                   label: const Padding(
+103:                     padding: EdgeInsets.symmetric(vertical: 18.0),
+104:                     child: Text('Speak Destination', style: TextStyle(fontSize: 20)),
+105:                   ),
+106:                 ),
+107:               ),
+108:               const SizedBox(height: 16),
+109:               // Quick actions card
+110:               Card(
+111:                 child: Padding(
+112:                   padding: const EdgeInsets.all(12),
+113:                   child: Row(
+114:                     children: [
+115:                       Expanded(
+116:                         child: _BigAction(
+117:                           icon: Icons.star,
+118:                           label: 'Favorites',
+119:                           onTap: () {
+120:                             Navigator.of(context).push(
+121:                               MaterialPageRoute(builder: (_) => const FavoritesPage()),
+122:                             );
+123:                           },
+124:                         ),
+125:                       ),
+126:                       const SizedBox(width: 12),
+127:                       Expanded(
+128:                         child: _BigAction(
+129:                           icon: Icons.help_outline,
+130:                           label: 'Help',
+131:                           onTap: () {
+132:                             Navigator.of(context).push(
+133:                               MaterialPageRoute(builder: (_) => const HelpPage()),
+134:                             );
+135:                           },
+136:                         ),
+137:                       ),
+138:                     ],
+139:                   ),
+140:                 ),
+141:               ),
+142:             ],
+143:           ),
+144:         ),
+145:       ),
+146:     );
+147:   }
+148: }
+149: 
+150: class _BigAction extends StatelessWidget {
+151:   final IconData icon;
+152:   final String label;
+153:   final VoidCallback onTap;
+154:   const _BigAction({required this.icon, required this.label, required this.onTap});
+155: 
+156:   @override
+157:   Widget build(BuildContext context) {
+158:     return Semantics(
+159:       button: true,
+160:       label: label,
+161:       child: SizedBox(
+162:         width: 150,
+163:         height: 80,
+164:         child: FilledButton.tonalIcon(
+165:           onPressed: onTap,
+166:           icon: Icon(icon, size: 24),
+167:           label: Text(label),
+168:         ),
+169:       ),
+170:     );
+171:   }
+172: }
