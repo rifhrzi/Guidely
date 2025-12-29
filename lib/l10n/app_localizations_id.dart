@@ -41,12 +41,10 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get homeVoiceWelcome =>
-      'Ucapkan Tujuan untuk mulai bernavigasi. Pintasan dan tujuan terbaru ada di bawah.';
+  String get homeVoiceWelcome => 'Ucapkan Tujuan untuk mulai bernavigasi. Pintasan dan tujuan terbaru ada di bawah.';
 
   @override
-  String get favoritesActionHint =>
-      'Lihat daftar landmark kampus favorit Anda.';
+  String get favoritesActionHint => 'Lihat daftar landmark kampus favorit Anda.';
 
   @override
   String get helpActionHint => 'Dengar tips dan perintah suara NavMate.';
@@ -58,8 +56,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsActionHint => 'Atur suara dan preferensi aksesibilitas.';
 
   @override
-  String get recentReopenHint =>
-      'Ketuk dua kali untuk menavigasi lagi ke tempat ini.';
+  String get recentReopenHint => 'Ketuk dua kali untuk menavigasi lagi ke tempat ini.';
 
   @override
   String navigationProgress(String percent) {
@@ -148,8 +145,7 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get voiceHintsSetting =>
-      'Petunjuk suara (saat TalkBack/VoiceOver mati)';
+  String get voiceHintsSetting => 'Petunjuk suara (saat TalkBack/VoiceOver mati)';
 
   @override
   String get clarityModeSetting => 'Mode jelas (TTS lebih lambat dan jelas)';
@@ -173,8 +169,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get testVoice => 'Uji suara';
 
   @override
-  String get talkbackNote =>
-      'Catatan: Kecepatan TalkBack/VoiceOver diatur oleh pengaturan aksesibilitas sistem.';
+  String get talkbackNote => 'Catatan: Kecepatan TalkBack/VoiceOver diatur oleh pengaturan aksesibilitas sistem.';
 
   @override
   String get language => 'Bahasa';
@@ -189,8 +184,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get english => 'Inggris';
 
   @override
-  String get helpBody =>
-      'Perintah suara:\n- Ucapkan Tujuan: Sebutkan nama gedung atau tempat.\n- Ulangi: Dengar ulang instruksi terakhir.\n- Batalkan: Hentikan navigasi.\n\nTips:\n- Pegang ponsel tegak untuk akurasi kompas yang lebih baik.\n- Izinkan lokasi presisi saat navigasi.';
+  String get helpBody => 'Perintah suara:\n- Ucapkan Tujuan: Sebutkan nama gedung atau tempat.\n- Ulangi: Dengar ulang instruksi terakhir.\n- Batalkan: Hentikan navigasi.\n\nTips:\n- Pegang ponsel tegak untuk akurasi kompas yang lebih baik.\n- Izinkan lokasi presisi saat navigasi.';
 
   @override
   String get repeatInstruction => 'Ulangi';
@@ -222,12 +216,10 @@ class AppLocalizationsId extends AppLocalizations {
   String get requestingPermission => 'Meminta izin mikrofon...';
 
   @override
-  String get micPermissionDeniedForever =>
-      'Izin mikrofon ditolak secara permanen. Aktifkan di Pengaturan untuk menggunakan input suara.';
+  String get micPermissionDeniedForever => 'Izin mikrofon ditolak secara permanen. Aktifkan di Pengaturan untuk menggunakan input suara.';
 
   @override
-  String get listeningFailed =>
-      'Saya tidak memahaminya. Anda bisa mencoba lagi atau ketik saja.';
+  String get listeningFailed => 'Saya tidak memahaminya. Anda bisa mencoba lagi atau ketik saja.';
 
   @override
   String get openAppSettings => 'Buka Pengaturan';
@@ -240,4 +232,57 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get submit => 'Kirim';
+
+  @override
+  String get reportObstacle => 'Laporkan Hambatan';
+
+  @override
+  String get reportObstacleHint => 'Laporkan hambatan atau rintangan di lokasi Anda saat ini';
+
+  @override
+  String get reportObstacleSubtitle => 'Hambatan akan dilaporkan di lokasi Anda saat ini';
+
+  @override
+  String get obstacleType => 'Jenis Hambatan';
+
+  @override
+  String get obstacleDescription => 'Deskripsi (opsional)';
+
+  @override
+  String get obstacleDescriptionHint => 'Jelaskan hambatan secara singkat...';
+
+  @override
+  String obstacleRadius(int meters) {
+    return 'Radius dampak: $meters meter';
+  }
+
+  @override
+  String get obstacleExpiration => 'Berlaku hingga';
+
+  @override
+  String get obstacleExpirationHint => 'Pilih berapa lama hambatan ini aktif';
+
+  @override
+  String get submitReport => 'Kirim Laporan';
+
+  @override
+  String get submitReportHint => 'Ketuk dua kali untuk mengirim laporan hambatan';
+
+  @override
+  String get submitting => 'Mengirim...';
+
+  @override
+  String get cancel => 'Batal';
+
+  @override
+  String get reportSuccess => 'Hambatan berhasil dilaporkan';
+
+  @override
+  String get reportFailed => 'Gagal melaporkan hambatan';
+
+  @override
+  String get noInternetConnection => 'Tidak ada koneksi internet';
+
+  @override
+  String get serviceUnavailable => 'Layanan tidak tersedia';
 }

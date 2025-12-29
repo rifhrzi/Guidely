@@ -272,8 +272,12 @@ class TurnDetector {
     var angle = outgoingBearing - incomingBearing;
 
     // Normalize to -180 to 180
-    while (angle > 180) angle -= 360;
-    while (angle < -180) angle += 360;
+    while (angle > 180) {
+      angle -= 360;
+    }
+    while (angle < -180) {
+      angle += 360;
+    }
 
     return angle;
   }

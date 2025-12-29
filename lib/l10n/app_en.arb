@@ -81,5 +81,29 @@
   "openAppSettings": "Open Settings",
   "typeYourDestination": "Type your destination",
   "enterDestinationHint": "Enter a building or place name",
-  "submit": "Submit"
+  "submit": "Submit",
+  "reportObstacle": "Report Obstacle",
+  "reportObstacleHint": "Report an obstacle or barrier at your current location",
+  "reportObstacleSubtitle": "Obstacle will be reported at your current location",
+  "obstacleType": "Obstacle Type",
+  "obstacleDescription": "Description (optional)",
+  "obstacleDescriptionHint": "Briefly describe the obstacle...",
+  "obstacleRadius": "Radius of effect: {meters} meters",
+  "@obstacleRadius": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "obstacleExpiration": "Valid until",
+  "obstacleExpirationHint": "Choose how long this obstacle is active",
+  "submitReport": "Submit Report",
+  "submitReportHint": "Double tap to submit the obstacle report",
+  "submitting": "Submitting...",
+  "cancel": "Cancel",
+  "reportSuccess": "Obstacle reported successfully",
+  "reportFailed": "Failed to report obstacle",
+  "noInternetConnection": "No internet connection",
+  "serviceUnavailable": "Service unavailable"
 }

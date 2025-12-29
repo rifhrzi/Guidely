@@ -10,7 +10,7 @@ This document summarizes the current state, goals, architecture, and usage of th
 
 **Core Features (MVP)**
 - Speak Destination: voice input with immediate listening, spoken confirmation, and retry.
-- Confirmation: “Did you say ‘…’?” dialog with Yes / Try again / No.
+- Confirmation: "Did you say '…'?" dialog with Yes / Try again / No.
 - Navigation: large arrow view with live distance updates and arrival announcement.
 - Campus Map: offline raster tiles (MBTiles) via `flutter_map`.
 - Favorites: campus landmarks list (library, class hall, prayer hall) loaded from assets.
@@ -62,20 +62,20 @@ This document summarizes the current state, goals, architecture, and usage of th
 - Current: Straight-line stub (no turn-by-turn) for development.
 - Planned: Offline A* over a campus walking-path graph.
   - Graph sources: OSM extract or university GIS. Include accessibility tags (ramps, stairs, slope, surface).
-  - Step generator: Use landmark names for human-friendly instructions (e.g., “Pass the Library entrance, 25 meters”).
+  - Step generator: Use landmark names for human-friendly instructions (e.g., "Pass the Library entrance, 25 meters").
   - Re-route: Off-route detection and quick recalculation.
 
 **Accessibility**
 - Screen reader detection: `A11y.screenReaderOn` reflects TalkBack/VoiceOver status.
-- Announcements: `A11y.announce()` uses SemanticsService when a screen reader is active; otherwise uses TTS fallback when “Voice hints” is on.
-- Clarity: Slower default TTS rate (0.7) with “Clarity mode” capping speed for intelligibility. TTS splits long sentences and inserts short pauses.
+- Announcements: `A11y.announce()` uses SemanticsService when a screen reader is active; otherwise uses TTS fallback when "Voice hints" is on.
+- Clarity: Slower default TTS rate (0.7) with "Clarity mode" capping speed for intelligibility. TTS splits long sentences and inserts short pauses.
 - Semantics: Large button targets (min height 64dp) with explicit labels on critical actions.
-- Confirmation: Spoken confirmation (“Did you say …?”), with Yes/Try again/No dialog.
+- Confirmation: Spoken confirmation ("Did you say …?"), with Yes/Try again/No dialog.
 
 **Voice Input (STT)**
 - Engine: `speech_to_text` (auto-restart, no listenFor timeout).
 - Tuning: Streaming single-utterance, automatic punctuation, speaker diarization (1-2 speakers), 16 kHz sample rate, Indonesian locale enforced, custom vocabulary seeded from landmarks.
-- Flow: VoiceDestination auto-listens on page open, allows “Listen again”, then shows a confirmation dialog.
+- Flow: VoiceDestination auto-listens on page open, allows "Listen again", then shows a confirmation dialog.
 
 **Text-To-Speech (TTS)**
 - Engine: `flutter_tts`.
@@ -136,7 +136,7 @@ This document summarizes the current state, goals, architecture, and usage of th
 **Platform Notes**
 - Android app label: `android/app/src/main/AndroidManifest.xml` → `android:label="NavMate"`.
 - iOS display name: `ios/Runner/Info.plist` → `CFBundleDisplayName = NavMate`.
-- Windows product strings updated to “NavMate”.
+- Windows product strings updated to "NavMate".
 
 **Privacy & Security**
 - Location/microphone used only for navigation; no analytics by default.
@@ -155,4 +155,7 @@ This document summarizes the current state, goals, architecture, and usage of th
 - Wire haptic patterns for left/right/straight/arrived.
 - Add landmark overlay to the map; tap-to-navigate from map.
 - Optional: Background/foreground service on Android for persistent navigation.
+
+
+
 

@@ -5,6 +5,10 @@ import '../accessibility/accessibility.dart';
 import '../haptics/haptics_service.dart';
 import '../location/location_service.dart';
 import '../map/campus_geojson.dart';
+import '../network/connectivity_service.dart';
+import '../obstacle/obstacle_monitor.dart';
+import '../obstacle/obstacle_store.dart';
+import '../obstacle/obstacle_sync_service.dart';
 import '../routing/pathfinder.dart';
 import '../speech/stt_service.dart';
 import '../tts/tts_service.dart';
@@ -20,6 +24,7 @@ class AppServices {
     LocationStream? location,
     HapticsService? haptics,
     AccessibilityService? accessibility,
+    ConnectivityService? connectivity,
   }) : _appState = appState {
     final resolvedTts = tts ?? RealTts(appState: appState);
     this.tts = resolvedTts;
@@ -41,6 +46,9 @@ class AppServices {
     this.accessibility =
         accessibility ??
         AccessibilityService(appState: appState, tts: resolvedTts);
+    
+    // Connectivity service
+    this.connectivity = connectivity ?? ConnectivityService();
   }
 
   final AppState _appState;
@@ -51,6 +59,61 @@ class AppServices {
   late final SttService stt;
   late final LocationStream location;
   late final HapticsService haptics;
+  late final ConnectivityService connectivity;
+  
+  // Lazy-initialized services (require async setup)
+  ObstacleStore? _obstacleStore;
+  ObstacleSyncService? _obstacleSyncService;
+  ObstacleMonitor? _obstacleMonitor;
+  
+  /// Get the obstacle store (lazy initialized).
+  ObstacleStore? get obstacleStore => _obstacleStore;
+  
+  /// Get the obstacle sync service (lazy initialized).
+  ObstacleSyncService? get obstacleSyncService => _obstacleSyncService;
+  
+  /// Get the obstacle monitor (lazy initialized).
+  ObstacleMonitor? get obstacleMonitor => _obstacleMonitor;
+  
+  /// Initialize async services (call after AppServices is created).
+  Future<void> initializeAsyncServices() async {
+    // Initialize obstacle store
+    _obstacleStore = await ObstacleStore.open();
+    
+    // Initialize sync service
+    _obstacleSyncService = ObstacleSyncService(
+      store: _obstacleStore!,
+      connectivity: connectivity,
+    );
+    await _obstacleSyncService!.initialize();
+    
+    // Initialize obstacle monitor
+    _obstacleMonitor = ObstacleMonitor(
+      store: _obstacleStore!,
+      tts: tts,
+      haptics: haptics,
+    );
+    
+    // Enable/disable obstacle monitor based on app state
+    _obstacleMonitor!.enabled = _appState.obstacleWarnings.value;
+    _appState.obstacleWarnings.addListener(_onObstacleWarningsChanged);
+  }
+  
+  void _onObstacleWarningsChanged() {
+    _obstacleMonitor?.enabled = _appState.obstacleWarnings.value;
+  }
+  
+  /// Sync obstacles from Firebase (call when going online).
+  Future<void> syncObstacles() async {
+    if (_obstacleSyncService == null) return;
+    _appState.setIsSyncing(true);
+    try {
+      await _obstacleSyncService!.syncFromFirebase();
+      _appState.setLastSyncTime(DateTime.now());
+    } finally {
+      _appState.setIsSyncing(false);
+    }
+  }
 
   /// Whether simulation mode is available.
   bool get canSimulate => _switchableLocation != null;

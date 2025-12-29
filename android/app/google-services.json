@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "612778856143",
+    "project_id": "sensenav-y5dri",
+    "storage_bucket": "sensenav-y5dri.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:612778856143:android:40bdfc2492312aea05b1ba",
+        "android_client_info": {
+          "package_name": "com.example.navmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVfq5cZIf1XfKGGmquvdEhnXJl_0edlKI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

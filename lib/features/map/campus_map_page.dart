@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:navmate/l10n/app_localizations.dart';
 
 import '../../core/map/campus_map_view.dart';
 import '../../core/map/mbtiles_tile_provider.dart';
+import '../../l10n/app_localizations.dart';
 
 class CampusMapPage extends StatelessWidget {
   const CampusMapPage({super.key});

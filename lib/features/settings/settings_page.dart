@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:navmate/l10n/app_localizations.dart';
-import 'package:navmate/core/app/app_scope.dart';
+
+import '../../core/app/app_scope.dart';
+import '../../core/app/app_state.dart';
+import '../../core/network/connectivity_service.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Settings page optimized for blind/low-vision users.
 ///
@@ -307,6 +310,209 @@ class _SettingsPageState extends State<SettingsPage> {
             
             const SizedBox(height: 24),
             
+            // === ONLINE/OFFLINE MODE SECTION ===
+            _SectionHeader(
+              icon: Icons.cloud_rounded,
+              title: 'Mode Aplikasi',
+              scheme: scheme,
+            ),
+            
+            // Online/Offline toggle
+            ValueListenableBuilder<AppMode>(
+              valueListenable: state.appMode,
+              builder: (_, mode, __) {
+                final isOnline = mode == AppMode.online;
+                return _SettingsSwitch(
+                  title: 'Mode Online',
+                  subtitle: isOnline
+                      ? 'Fitur penuh dengan sinkronisasi'
+                      : 'Mode offline - navigasi dasar',
+                  value: isOnline,
+                  onChanged: (newValue) {
+                    hapticsService.tick();
+                    HapticFeedback.selectionClick();
+                    state.setAppMode(
+                      newValue ? AppMode.online : AppMode.offline,
+                    );
+                    if (newValue) {
+                      tts.speak('Mode online diaktifkan');
+                      // Trigger sync when going online
+                      context.services.syncObstacles();
+                    } else {
+                      tts.speak('Mode offline diaktifkan');
+                    }
+                  },
+                );
+              },
+            ),
+            
+            // Connectivity status
+            ValueListenableBuilder<ConnectivityStatus>(
+              valueListenable: context.services.connectivity.statusNotifier,
+              builder: (_, status, __) => _SettingsInfo(
+                title: 'Status Koneksi',
+                value: status == ConnectivityStatus.online
+                    ? 'Terhubung'
+                    : (status == ConnectivityStatus.offline
+                        ? 'Tidak Terhubung'
+                        : 'Memeriksa...'),
+                icon: status == ConnectivityStatus.online
+                    ? Icons.wifi_rounded
+                    : Icons.wifi_off_rounded,
+                iconColor: status == ConnectivityStatus.online
+                    ? Colors.green
+                    : scheme.error,
+              ),
+            ),
+            
+            // Sync status
+            ValueListenableBuilder<bool>(
+              valueListenable: state.isSyncing,
+              builder: (_, isSyncing, __) => ValueListenableBuilder<DateTime?>(
+                valueListenable: state.lastSyncTime,
+                builder: (_, lastSync, __) {
+                  final syncText = isSyncing
+                      ? 'Sedang menyinkronkan...'
+                      : (lastSync != null
+                          ? 'Terakhir: ${_formatTime(lastSync)}'
+                          : 'Belum pernah sinkronisasi');
+                  return _SettingsAction(
+                    title: 'Sinkronisasi Data',
+                    subtitle: syncText,
+                    icon: isSyncing
+                        ? Icons.sync_rounded
+                        : Icons.cloud_sync_rounded,
+                    onTap: isSyncing
+                        ? null
+                        : () {
+                            hapticsService.tick();
+                            HapticFeedback.mediumImpact();
+                            tts.speak('Memulai sinkronisasi');
+                            context.services.syncObstacles();
+                          },
+                  );
+                },
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // === OBSTACLE DETECTION SECTION ===
+            _SectionHeader(
+              icon: Icons.warning_rounded,
+              title: 'Deteksi Hambatan',
+              scheme: scheme,
+            ),
+            
+            ValueListenableBuilder<bool>(
+              valueListenable: state.obstacleWarnings,
+              builder: (_, value, __) => _SettingsSwitch(
+                title: 'Peringatan Hambatan',
+                subtitle: value
+                    ? 'Anda akan diberi tahu tentang hambatan'
+                    : 'Peringatan hambatan dinonaktifkan',
+                value: value,
+                onChanged: (newValue) {
+                  hapticsService.tick();
+                  HapticFeedback.selectionClick();
+                  state.setObstacleWarnings(newValue);
+                  if (newValue) {
+                    tts.speak('Peringatan hambatan diaktifkan');
+                  } else {
+                    tts.speak('Peringatan hambatan dinonaktifkan');
+                  }
+                },
+              ),
+            ),
+            
+            // Show obstacle count
+            Builder(
+              builder: (context) {
+                final store = context.services.obstacleStore;
+                final count = store?.getActiveCount() ?? 0;
+                return _SettingsInfo(
+                  title: 'Hambatan Tersimpan',
+                  value: '$count hambatan aktif',
+                  icon: Icons.construction_rounded,
+                  iconColor: count > 0 ? Colors.orange : scheme.onSurfaceVariant,
+                );
+              },
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // === CROWD DETECTION SECTION ===
+            _SectionHeader(
+              icon: Icons.groups_rounded,
+              title: 'Deteksi Keramaian',
+              scheme: scheme,
+            ),
+            
+            ValueListenableBuilder<bool>(
+              valueListenable: state.crowdDetection,
+              builder: (_, value, __) => _SettingsSwitch(
+                title: 'Deteksi Keramaian',
+                subtitle: value
+                    ? 'Aktif (memerlukan Bluetooth)'
+                    : 'Tidak aktif',
+                value: value,
+                onChanged: (newValue) {
+                  hapticsService.tick();
+                  HapticFeedback.selectionClick();
+                  state.setCrowdDetection(newValue);
+                  if (newValue) {
+                    tts.speak('Deteksi keramaian diaktifkan');
+                  } else {
+                    tts.speak('Deteksi keramaian dinonaktifkan');
+                  }
+                },
+              ),
+            ),
+            
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline_rounded,
+                          color: scheme.onSurfaceVariant,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Tentang Deteksi Keramaian',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: scheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Fitur ini menggunakan Bluetooth untuk mendeteksi '
+                      'kepadatan area di sekitar Anda. Memerlukan izin '
+                      'Bluetooth dan hanya aktif dalam mode online.',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
             // === LANGUAGE SECTION ===
             _SectionHeader(
               icon: Icons.language_rounded,
@@ -572,13 +778,13 @@ class _SettingsAction extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.onTap,
+    this.onTap,
   });
 
   final String title;
   final String subtitle;
   final IconData icon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -790,5 +996,21 @@ class _LanguageOption extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Format a DateTime for display.
+String _formatTime(DateTime time) {
+  final now = DateTime.now();
+  final diff = now.difference(time);
+  
+  if (diff.inMinutes < 1) {
+    return 'Baru saja';
+  } else if (diff.inMinutes < 60) {
+    return '${diff.inMinutes} menit lalu';
+  } else if (diff.inHours < 24) {
+    return '${diff.inHours} jam lalu';
+  } else {
+    return '${diff.inDays} hari lalu';
   }
 }

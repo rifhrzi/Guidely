@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:navmate/core/app/app_scope.dart';
-import 'package:navmate/core/data/landmarks.dart';
-import 'package:navmate/core/destination/landmark_matcher.dart';
-import 'package:navmate/core/logging/logger.dart';
-import 'package:navmate/core/permissions/permissions.dart';
-import 'package:navmate/features/destination/confirm_destination_page.dart';
-import 'package:navmate/l10n/app_localizations.dart';
+
+import '../../core/app/app_scope.dart';
+import '../../core/data/landmarks.dart';
+import '../../core/destination/landmark_matcher.dart';
+import '../../core/logging/logger.dart';
+import '../../core/permissions/permissions.dart';
+import '../../l10n/app_localizations.dart';
+import 'confirm_destination_page.dart';
 
 /// Voice destination page optimized for blind/low-vision users.
 ///

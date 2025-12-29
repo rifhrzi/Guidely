@@ -6,19 +6,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as ll;
 
-import 'package:navmate/core/logging/logger.dart';
-import 'package:navmate/core/map/campus_geojson.dart';
-import 'package:navmate/core/routing/pathfinder.dart';
-import 'package:navmate/core/routing/turn_detector.dart';
-import 'package:navmate/core/types/geo.dart' as core_geo;
-
-import 'package:navmate/l10n/app_localizations.dart';
-
-import 'package:navmate/core/app/app_scope.dart';
-import 'package:navmate/core/app/services.dart';
-import 'package:navmate/core/data/landmarks.dart';
-import 'package:navmate/core/map/campus_map_view.dart';
-import 'package:navmate/core/map/mbtiles_tile_provider.dart';
+import '../../core/app/app_scope.dart';
+import '../../core/app/services.dart';
+import '../../core/data/landmarks.dart';
+import '../../core/logging/logger.dart';
+import '../../core/map/campus_geojson.dart';
+import '../../core/map/campus_map_view.dart';
+import '../../core/map/mbtiles_tile_provider.dart';
+import '../../core/obstacle/obstacle.dart';
+import '../../core/routing/pathfinder.dart';
+import '../../core/routing/turn_detector.dart';
+import '../../core/types/geo.dart' as core_geo;
+import '../../l10n/app_localizations.dart';
+import 'report_obstacle_dialog.dart';
 
 /// Navigation page optimized for blind/low-vision users.
 ///
@@ -83,6 +83,11 @@ class _NavigationPageState extends State<NavigationPage> {
   core_geo.LatLng? _lastProcessedPosition;
   static const Duration _locationUpdateThrottle = Duration(milliseconds: 500);
   static const double _minPositionChangeMeter = 2.0;
+  
+  // Obstacle tracking
+  List<Obstacle> _nearbyObstacles = [];
+  DateTime? _lastObstacleCheck;
+  static const Duration _obstacleCheckInterval = Duration(seconds: 2);
 
   static const List<int> _guidanceMilestones = [
     200,
@@ -243,6 +248,9 @@ class _NavigationPageState extends State<NavigationPage> {
 
         // Check for upcoming turns
         _checkTurns(position);
+        
+        // Check for nearby obstacles
+        _checkObstacles(position, now);
       },
       onError: (error, stackTrace) {
         if (!mounted) return;
@@ -250,6 +258,29 @@ class _NavigationPageState extends State<NavigationPage> {
         setState(() => _locationError = error);
       },
     );
+  }
+  
+  /// Check for nearby obstacles and update state.
+  void _checkObstacles(core_geo.LatLng position, DateTime now) {
+    // Throttle obstacle checks
+    if (_lastObstacleCheck != null &&
+        now.difference(_lastObstacleCheck!) < _obstacleCheckInterval) {
+      return;
+    }
+    _lastObstacleCheck = now;
+    
+    final monitor = services.obstacleMonitor;
+    if (monitor == null || !monitor.enabled) return;
+    
+    // Check proximity and get nearby obstacles
+    monitor.checkProximity(position).then((obstacles) {
+      if (!mounted) return;
+      if (obstacles.isNotEmpty && obstacles != _nearbyObstacles) {
+        setState(() => _nearbyObstacles = obstacles);
+      } else if (obstacles.isEmpty && _nearbyObstacles.isNotEmpty) {
+        setState(() => _nearbyObstacles = []);
+      }
+    });
   }
 
   @override
@@ -349,6 +380,28 @@ class _NavigationPageState extends State<NavigationPage> {
                       ),
                     
                     if (_nextTurn != null && !_arrivalAnnounced)
+                      const SizedBox(height: 16),
+                    
+                    // === OBSTACLE WARNING ===
+                    if (_nearbyObstacles.isNotEmpty)
+                      _ObstacleWarningCard(
+                        obstacles: _nearbyObstacles,
+                        currentPosition: _currentPosition,
+                        theme: theme,
+                        scheme: scheme,
+                        onTap: () {
+                          // Announce obstacles when tapped
+                          services.haptics.warning();
+                          final obstacleNames = _nearbyObstacles
+                              .map((o) => o.name)
+                              .join(', ');
+                          services.tts.speak(
+                            'Hambatan di sekitar: $obstacleNames',
+                          );
+                        },
+                      ),
+                    
+                    if (_nearbyObstacles.isNotEmpty)
                       const SizedBox(height: 16),
                     
                     // === STATUS / INSTRUCTION ===
@@ -575,6 +628,17 @@ class _NavigationPageState extends State<NavigationPage> {
         
         const SizedBox(height: 12),
         
+        // === REPORT OBSTACLE ===
+        _LargeActionButton(
+          icon: Icons.warning_amber_rounded,
+          label: l10n.reportObstacle,
+          backgroundColor: scheme.tertiaryContainer,
+          foregroundColor: scheme.onTertiaryContainer,
+          onPressed: () => _showReportObstacleDialog(),
+        ),
+        
+        const SizedBox(height: 12),
+        
         // === END NAVIGATION ===
         _LargeActionButton(
           icon: Icons.close_rounded,
@@ -590,6 +654,27 @@ class _NavigationPageState extends State<NavigationPage> {
         ),
       ],
     );
+  }
+  
+  /// Show the report obstacle dialog.
+  Future<void> _showReportObstacleDialog() async {
+    final position = _currentPosition;
+    if (position == null) {
+      // Cannot report without a position
+      services.haptics.warning();
+      services.tts.speak('Lokasi tidak tersedia. Tunggu sinyal GPS.');
+      return;
+    }
+    
+    services.haptics.tick();
+    HapticFeedback.mediumImpact();
+    
+    final obstacleId = await ReportObstacleDialog.show(context, position);
+    
+    if (obstacleId != null && mounted) {
+      // Obstacle reported successfully - refresh nearby obstacles
+      _checkObstacles(position, DateTime.now());
+    }
   }
 
   ll.LatLng _toMapLatLng(core_geo.LatLng value) =>
@@ -1530,5 +1615,131 @@ class _TurnIndicator extends StatelessWidget {
       case TurnType.arrived:
         return 'Tujuan';
     }
+  }
+}
+
+/// Warning card showing nearby obstacles.
+class _ObstacleWarningCard extends StatelessWidget {
+  const _ObstacleWarningCard({
+    required this.obstacles,
+    required this.currentPosition,
+    required this.theme,
+    required this.scheme,
+    required this.onTap,
+  });
+
+  final List<Obstacle> obstacles;
+  final core_geo.LatLng? currentPosition;
+  final ThemeData theme;
+  final ColorScheme scheme;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    if (obstacles.isEmpty) return const SizedBox.shrink();
+
+    final obstacleCount = obstacles.length;
+    final nearestObstacle = obstacles.first;
+    
+    // Calculate distance to nearest obstacle
+    double? distance;
+    if (currentPosition != null) {
+      distance = core_geo.haversineMeters(
+        currentPosition!,
+        core_geo.LatLng(nearestObstacle.lat, nearestObstacle.lng),
+      );
+    }
+
+    return Semantics(
+      button: true,
+      label: 'Peringatan: $obstacleCount hambatan di sekitar. '
+          '${nearestObstacle.name}. Ketuk untuk detail.',
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: scheme.errorContainer,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: scheme.error,
+              width: 2,
+            ),
+          ),
+          child: Row(
+            children: [
+              // Warning icon
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: scheme.error,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.warning_rounded,
+                  size: 32,
+                  color: scheme.onError,
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Obstacle info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      obstacleCount == 1
+                          ? 'Hambatan Terdeteksi'
+                          : '$obstacleCount Hambatan Terdeteksi',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: scheme.onErrorContainer,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      nearestObstacle.name,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: scheme.onErrorContainer.withValues(alpha: 0.9),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (distance != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        '${distance.round()} meter',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: scheme.onErrorContainer.withValues(alpha: 0.8),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              // Distance badge
+              if (distance != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: scheme.error,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${distance.round()}m',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: scheme.onError,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

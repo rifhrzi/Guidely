@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:navmate/l10n/app_localizations.dart';
-
-import 'package:navmate/core/app/app_scope.dart';
-import 'package:navmate/core/data/landmarks.dart';
-import 'package:navmate/core/destination/landmark_matcher.dart';
-import 'package:navmate/core/types/geo.dart' as core_geo;
-import 'package:navmate/features/navigation/navigation_page.dart';
+import '../../core/app/app_scope.dart';
+import '../../core/data/landmarks.dart';
+import '../../core/destination/landmark_matcher.dart';
+import '../../core/types/geo.dart' as core_geo;
+import '../../l10n/app_localizations.dart';
+import '../navigation/navigation_page.dart';
 
 class ConfirmDestinationPage extends StatefulWidget {
   const ConfirmDestinationPage({

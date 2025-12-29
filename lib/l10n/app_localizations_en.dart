@@ -41,8 +41,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeVoiceWelcome =>
-      'Speak Destination to begin navigation. Quick actions and recent destinations follow.';
+  String get homeVoiceWelcome => 'Speak Destination to begin navigation. Quick actions and recent destinations follow.';
 
   @override
   String get favoritesActionHint => 'Browse your saved campus landmarks.';
@@ -54,12 +53,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapActionHint => 'Open the offline campus map.';
 
   @override
-  String get settingsActionHint =>
-      'Adjust voice and accessibility preferences.';
+  String get settingsActionHint => 'Adjust voice and accessibility preferences.';
 
   @override
-  String get recentReopenHint =>
-      'Double tap to restart navigation to this place.';
+  String get recentReopenHint => 'Double tap to restart navigation to this place.';
 
   @override
   String navigationProgress(String percent) {
@@ -148,8 +145,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get voiceHintsSetting =>
-      'Voice hints (when TalkBack/VoiceOver is off)';
+  String get voiceHintsSetting => 'Voice hints (when TalkBack/VoiceOver is off)';
 
   @override
   String get clarityModeSetting => 'Clarity mode (slower, clearer TTS)';
@@ -173,8 +169,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get testVoice => 'Test voice';
 
   @override
-  String get talkbackNote =>
-      'Note: TalkBack/VoiceOver speed is controlled by system accessibility settings.';
+  String get talkbackNote => 'Note: TalkBack/VoiceOver speed is controlled by system accessibility settings.';
 
   @override
   String get language => 'Language';
@@ -189,8 +184,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
-  String get helpBody =>
-      'Voice commands:\n- Speak Destination: Say building or place name.\n- Repeat: Hear the last instruction again.\n- Cancel: Stop navigation.\n\nTips:\n- Keep phone upright for better compass accuracy.\n- Allow precise location while navigating.';
+  String get helpBody => 'Voice commands:\n- Speak Destination: Say building or place name.\n- Repeat: Hear the last instruction again.\n- Cancel: Stop navigation.\n\nTips:\n- Keep phone upright for better compass accuracy.\n- Allow precise location while navigating.';
 
   @override
   String get repeatInstruction => 'Repeat';
@@ -222,12 +216,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get requestingPermission => 'Requesting microphone permission...';
 
   @override
-  String get micPermissionDeniedForever =>
-      'Microphone permission permanently denied. Enable it in Settings to use voice input.';
+  String get micPermissionDeniedForever => 'Microphone permission permanently denied. Enable it in Settings to use voice input.';
 
   @override
-  String get listeningFailed =>
-      'I couldn\'t understand that. You can try again or type instead.';
+  String get listeningFailed => 'I couldn\'t understand that. You can try again or type instead.';
 
   @override
   String get openAppSettings => 'Open Settings';
@@ -240,4 +232,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get submit => 'Submit';
+
+  @override
+  String get reportObstacle => 'Report Obstacle';
+
+  @override
+  String get reportObstacleHint => 'Report an obstacle or barrier at your current location';
+
+  @override
+  String get reportObstacleSubtitle => 'Obstacle will be reported at your current location';
+
+  @override
+  String get obstacleType => 'Obstacle Type';
+
+  @override
+  String get obstacleDescription => 'Description (optional)';
+
+  @override
+  String get obstacleDescriptionHint => 'Briefly describe the obstacle...';
+
+  @override
+  String obstacleRadius(int meters) {
+    return 'Radius of effect: $meters meters';
+  }
+
+  @override
+  String get obstacleExpiration => 'Valid until';
+
+  @override
+  String get obstacleExpirationHint => 'Choose how long this obstacle is active';
+
+  @override
+  String get submitReport => 'Submit Report';
+
+  @override
+  String get submitReportHint => 'Double tap to submit the obstacle report';
+
+  @override
+  String get submitting => 'Submitting...';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get reportSuccess => 'Obstacle reported successfully';
+
+  @override
+  String get reportFailed => 'Failed to report obstacle';
+
+  @override
+  String get noInternetConnection => 'No internet connection';
+
+  @override
+  String get serviceUnavailable => 'Service unavailable';
 }

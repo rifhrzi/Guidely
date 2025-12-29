@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:navmate/l10n/app_localizations.dart';
+
+import '../../l10n/app_localizations.dart';
 
 class HelpPage extends StatelessWidget {
   const HelpPage({super.key});

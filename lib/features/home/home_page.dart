@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:navmate/core/app/app_scope.dart';
-import 'package:navmate/core/app/app_state.dart';
-import 'package:navmate/core/data/landmarks.dart';
-import 'package:navmate/core/types/geo.dart' as core_geo;
-import 'package:navmate/features/navigation/navigation_page.dart';
-import 'package:navmate/l10n/app_localizations.dart';
 
+import '../../core/app/app_scope.dart';
+import '../../core/app/app_state.dart';
+import '../../core/data/landmarks.dart';
+import '../../core/types/geo.dart' as core_geo;
+import '../../l10n/app_localizations.dart';
 import '../destination/voice_destination_page.dart';
 import '../favorites/favorites_page.dart';
 import '../help/help_page.dart';
 import '../map/campus_map_page.dart';
+import '../navigation/navigation_page.dart';
 import '../settings/settings_page.dart';
 
 /// Home page optimized for blind/low-vision users.

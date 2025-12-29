@@ -653,3 +653,6 @@ class AccessibilityService {
 
 *NavMate - Membantu Tunanetra Bernavigasi dengan Mandiri*
 
+
+
+

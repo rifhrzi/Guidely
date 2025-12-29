@@ -63,6 +63,12 @@ class TestHaptics implements HapticsService {
 
   @override
   Future<void> tick() async {}
+
+  @override
+  Future<void> warning() async {}
+
+  @override
+  Future<void> danger() async {}
 }
 
 void main() {

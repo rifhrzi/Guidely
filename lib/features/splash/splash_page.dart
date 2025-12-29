@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:navmate/core/map/campus_geojson.dart';
-import 'package:navmate/features/home/home_page.dart';
+import '../../core/map/campus_geojson.dart';
+import '../home/home_page.dart';
 
 /// Splash screen shown when the app starts.
 /// 

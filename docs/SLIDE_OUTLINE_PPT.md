@@ -442,3 +442,7 @@ Contact:
 
 5. "Library speech recognition apa yang dipakai?"
    → speech_to_text dengan engine platform native (Google/Apple)
+
+
+
+

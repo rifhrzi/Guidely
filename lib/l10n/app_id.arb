@@ -81,5 +81,29 @@
   "openAppSettings": "Buka Pengaturan",
   "typeYourDestination": "Ketik tujuan Anda",
   "enterDestinationHint": "Masukkan nama gedung atau tempat",
-  "submit": "Kirim"
+  "submit": "Kirim",
+  "reportObstacle": "Laporkan Hambatan",
+  "reportObstacleHint": "Laporkan hambatan atau rintangan di lokasi Anda saat ini",
+  "reportObstacleSubtitle": "Hambatan akan dilaporkan di lokasi Anda saat ini",
+  "obstacleType": "Jenis Hambatan",
+  "obstacleDescription": "Deskripsi (opsional)",
+  "obstacleDescriptionHint": "Jelaskan hambatan secara singkat...",
+  "obstacleRadius": "Radius dampak: {meters} meter",
+  "@obstacleRadius": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "obstacleExpiration": "Berlaku hingga",
+  "obstacleExpirationHint": "Pilih berapa lama hambatan ini aktif",
+  "submitReport": "Kirim Laporan",
+  "submitReportHint": "Ketuk dua kali untuk mengirim laporan hambatan",
+  "submitting": "Mengirim...",
+  "cancel": "Batal",
+  "reportSuccess": "Hambatan berhasil dilaporkan",
+  "reportFailed": "Gagal melaporkan hambatan",
+  "noInternetConnection": "Tidak ada koneksi internet",
+  "serviceUnavailable": "Layanan tidak tersedia"
 }

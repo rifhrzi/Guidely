@@ -1,7 +1,0 @@
-﻿String _poiIdForName(String name) {
-  final normalized =
-      name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_');
-  final collapsed = normalized.replaceAll(RegExp('_+'), '_');
-  final trimmed = collapsed.replaceAll(RegExp(r'^_|_$'), '');
-  return 'poi_$trimmed';
-}

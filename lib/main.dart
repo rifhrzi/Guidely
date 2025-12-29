@@ -1,16 +1,42 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:navmate/core/app/app_scope.dart';
-import 'package:navmate/core/app/app_state.dart';
-import 'package:navmate/core/app/services.dart';
-import 'package:navmate/features/splash/splash_page.dart';
-import 'package:navmate/l10n/app_localizations.dart';
-import 'package:navmate/theme/app_theme.dart';
 
-void main() {
+import 'core/app/app_scope.dart';
+import 'core/app/app_state.dart';
+import 'core/app/services.dart';
+import 'core/logging/logger.dart';
+import 'features/splash/splash_page.dart';
+import 'firebase_options.dart';
+import 'l10n/app_localizations.dart';
+import 'theme/app_theme.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase (optional - may fail if not configured)
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    logInfo('Firebase initialized successfully');
+  } catch (e) {
+    logWarn('Firebase initialization failed (online features disabled): $e');
+    // App can still work in offline mode without Firebase
+  }
+  
   final appState = AppState();
   final services = AppServices(appState: appState);
+  
+  // Initialize async services (obstacle detection, etc.)
+  try {
+    await services.initializeAsyncServices();
+    logInfo('Async services initialized successfully');
+  } catch (e) {
+    logWarn('Async services initialization failed: $e');
+    // App can still work without obstacle detection
+  }
+  
   runApp(
     AppScope(state: appState, services: services, child: const NavMateApp()),
   );
