@@ -35,6 +35,10 @@ enum ObstacleType {
   }
 }
 
+/// Radius in meters for considering obstacles as duplicates.
+/// Reports within this distance are consolidated into one obstacle.
+const double duplicateReportRadiusMeters = 5.0;
+
 /// Represents an obstacle or temporary barrier on the campus.
 class Obstacle {
   const Obstacle({
@@ -49,6 +53,7 @@ class Obstacle {
     this.expiresAt,
     this.isActive = true,
     this.reportedBy,
+    this.reportCount = 1,
   });
 
   /// Unique identifier.
@@ -85,6 +90,11 @@ class Obstacle {
   /// Who reported this obstacle (optional).
   final String? reportedBy;
 
+  /// Number of times this obstacle has been reported.
+  /// Multiple reports at the same location increment this count
+  /// instead of creating duplicate obstacles.
+  final int reportCount;
+
   /// Whether the obstacle has expired.
   bool get isExpired {
     if (expiresAt == null) return false;
@@ -120,6 +130,7 @@ class Obstacle {
           : null,
       isActive: json['is_active'] as bool? ?? true,
       reportedBy: json['reported_by'] as String?,
+      reportCount: (json['report_count'] as num?)?.toInt() ?? 1,
     );
   }
 
@@ -141,6 +152,7 @@ class Obstacle {
           : null,
       isActive: data['is_active'] as bool? ?? true,
       reportedBy: data['reported_by'] as String?,
+      reportCount: (data['report_count'] as num?)?.toInt() ?? 1,
     );
   }
 
@@ -158,6 +170,7 @@ class Obstacle {
       'expires_at': expiresAt?.millisecondsSinceEpoch,
       'is_active': isActive,
       'reported_by': reportedBy,
+      'report_count': reportCount,
     };
   }
 
@@ -174,6 +187,7 @@ class Obstacle {
     DateTime? expiresAt,
     bool? isActive,
     String? reportedBy,
+    int? reportCount,
   }) {
     return Obstacle(
       id: id ?? this.id,
@@ -187,6 +201,7 @@ class Obstacle {
       expiresAt: expiresAt ?? this.expiresAt,
       isActive: isActive ?? this.isActive,
       reportedBy: reportedBy ?? this.reportedBy,
+      reportCount: reportCount ?? this.reportCount,
     );
   }
 
@@ -204,5 +219,8 @@ class Obstacle {
 
   @override
   int get hashCode => id.hashCode;
-}
 
+  /// Whether this obstacle has multiple reports (same location reported by
+  /// multiple users).
+  bool get hasMultipleReports => reportCount > 1;
+}

@@ -1619,6 +1619,9 @@ class _TurnIndicator extends StatelessWidget {
 }
 
 /// Warning card showing nearby obstacles.
+/// 
+/// Displays clustered obstacles (when 3+ reports are in the same area)
+/// as a single entry with a report count indicator.
 class _ObstacleWarningCard extends StatelessWidget {
   const _ObstacleWarningCard({
     required this.obstacles,
@@ -1641,6 +1644,15 @@ class _ObstacleWarningCard extends StatelessWidget {
     final obstacleCount = obstacles.length;
     final nearestObstacle = obstacles.first;
     
+    // Calculate total report count (including obstacles with multiple reports)
+    final totalReportCount = obstacles.fold<int>(
+      0, 
+      (sum, obstacle) => sum + obstacle.reportCount,
+    );
+    
+    // Check if the nearest obstacle has multiple reports
+    final hasMultipleReports = nearestObstacle.hasMultipleReports;
+    
     // Calculate distance to nearest obstacle
     double? distance;
     if (currentPosition != null) {
@@ -1649,11 +1661,38 @@ class _ObstacleWarningCard extends StatelessWidget {
         core_geo.LatLng(nearestObstacle.lat, nearestObstacle.lng),
       );
     }
+    
+    // Build title text based on report count
+    String titleText;
+    if (hasMultipleReports) {
+      titleText = 'Area Hambatan (${nearestObstacle.reportCount} laporan)';
+    } else if (obstacleCount == 1) {
+      titleText = 'Hambatan Terdeteksi';
+    } else {
+      titleText = '$obstacleCount Hambatan Terdeteksi';
+    }
+    
+    // Build subtitle text
+    String subtitleText;
+    if (hasMultipleReports) {
+      subtitleText = nearestObstacle.type.displayName;
+    } else {
+      subtitleText = nearestObstacle.name;
+    }
+    
+    // Build semantics label
+    String semanticsLabel;
+    if (hasMultipleReports) {
+      semanticsLabel = 'Peringatan: Area dengan ${nearestObstacle.reportCount} '
+          'laporan ${nearestObstacle.type.displayName}. Ketuk untuk detail.';
+    } else {
+      semanticsLabel = 'Peringatan: $obstacleCount hambatan di sekitar. '
+          '${nearestObstacle.name}. Ketuk untuk detail.';
+    }
 
     return Semantics(
       button: true,
-      label: 'Peringatan: $obstacleCount hambatan di sekitar. '
-          '${nearestObstacle.name}. Ketuk untuk detail.',
+      label: semanticsLabel,
       child: GestureDetector(
         onTap: onTap,
         child: Container(
@@ -1668,19 +1707,51 @@ class _ObstacleWarningCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              // Warning icon
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: scheme.error,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.warning_rounded,
-                  size: 32,
-                  color: scheme.onError,
-                ),
+              // Warning icon with cluster indicator
+              Stack(
+                children: [
+                  Container(
+                    width: 56,
+                    height: 56,
+                    decoration: BoxDecoration(
+                      color: scheme.error,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.warning_rounded,
+                      size: 32,
+                      color: scheme.onError,
+                    ),
+                  ),
+                  // Show report count badge for obstacles with multiple reports
+                  if (hasMultipleReports || totalReportCount > obstacleCount)
+                    Positioned(
+                      right: -2,
+                      top: -2,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: scheme.tertiary,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: scheme.errorContainer,
+                            width: 2,
+                          ),
+                        ),
+                        child: Text(
+                          '$totalReportCount',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: scheme.onTertiary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
               ),
               const SizedBox(width: 16),
               // Obstacle info
@@ -1689,9 +1760,7 @@ class _ObstacleWarningCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      obstacleCount == 1
-                          ? 'Hambatan Terdeteksi'
-                          : '$obstacleCount Hambatan Terdeteksi',
+                      titleText,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         color: scheme.onErrorContainer,
@@ -1699,7 +1768,7 @@ class _ObstacleWarningCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      nearestObstacle.name,
+                      subtitleText,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: scheme.onErrorContainer.withValues(alpha: 0.9),
                         fontWeight: FontWeight.w500,

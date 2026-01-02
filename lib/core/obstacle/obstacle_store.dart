@@ -50,9 +50,18 @@ class ObstacleStore {
         expires_at INTEGER,
         is_active INTEGER DEFAULT 1,
         reported_by TEXT,
-        synced_at INTEGER
+        synced_at INTEGER,
+        report_count INTEGER DEFAULT 1
       )
     ''');
+
+    // Migration: Add report_count column if it doesn't exist
+    try {
+      _db.execute('ALTER TABLE obstacles ADD COLUMN report_count INTEGER DEFAULT 1');
+      logDebug('Added report_count column to obstacles table');
+    } catch (e) {
+      // Column already exists, ignore
+    }
 
     // Create spatial index for faster proximity queries
     _db.execute('''
@@ -72,8 +81,8 @@ class ObstacleStore {
       _db.execute('''
         INSERT OR REPLACE INTO obstacles 
         (id, name, description, lat, lng, radius_meters, type, 
-         reported_at, expires_at, is_active, reported_by, synced_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+         reported_at, expires_at, is_active, reported_by, synced_at, report_count)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       ''', [
         obstacle.id,
         obstacle.name,
@@ -87,6 +96,7 @@ class ObstacleStore {
         obstacle.isActive ? 1 : 0,
         obstacle.reportedBy,
         DateTime.now().millisecondsSinceEpoch,
+        obstacle.reportCount,
       ]);
       logDebug('Upserted obstacle: ${obstacle.id}');
     } catch (e, stackTrace) {
@@ -105,8 +115,8 @@ class ObstacleStore {
         _db.execute('''
           INSERT OR REPLACE INTO obstacles 
           (id, name, description, lat, lng, radius_meters, type, 
-           reported_at, expires_at, is_active, reported_by, synced_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           reported_at, expires_at, is_active, reported_by, synced_at, report_count)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', [
           obstacle.id,
           obstacle.name,
@@ -120,6 +130,7 @@ class ObstacleStore {
           obstacle.isActive ? 1 : 0,
           obstacle.reportedBy,
           DateTime.now().millisecondsSinceEpoch,
+          obstacle.reportCount,
         ]);
       }
       _db.execute('COMMIT');
@@ -291,6 +302,7 @@ class ObstacleStore {
           : null,
       isActive: (row['is_active'] as int) == 1,
       reportedBy: row['reported_by'] as String?,
+      reportCount: (row['report_count'] as int?) ?? 1,
     );
   }
 
@@ -302,6 +314,61 @@ class ObstacleStore {
       logDebug('Obstacle database closed');
     } catch (e) {
       logWarn('Error closing obstacle database: $e');
+    }
+  }
+
+  // ============================================================
+  // DUPLICATE DETECTION METHODS
+  // ============================================================
+
+  /// Find an existing active obstacle within [radiusMeters] of the given location.
+  ///
+  /// Used to prevent duplicate reports - if a report is within 5m of an
+  /// existing obstacle, we increment the report count instead of creating
+  /// a new entry.
+  ///
+  /// Returns the nearest obstacle if found, or null if no obstacle is nearby.
+  Obstacle? findNearbyActiveObstacle(
+    double lat,
+    double lng, {
+    double radiusMeters = duplicateReportRadiusMeters,
+  }) {
+    final nearby = getObstaclesNearby(lat, lng, radiusMeters);
+    if (nearby.isEmpty) return null;
+
+    // Return the nearest one
+    final center = LatLng(lat, lng);
+    Obstacle? nearest;
+    double? nearestDistance;
+
+    for (final obstacle in nearby) {
+      final obstaclePos = LatLng(obstacle.lat, obstacle.lng);
+      final distance = haversineMeters(center, obstaclePos);
+      if (nearestDistance == null || distance < nearestDistance) {
+        nearest = obstacle;
+        nearestDistance = distance;
+      }
+    }
+
+    return nearest;
+  }
+
+  /// Increment the report count for an existing obstacle.
+  ///
+  /// Called when a new report is made for an obstacle that already exists
+  /// in the same location (within 5m).
+  void incrementReportCount(String obstacleId) {
+    try {
+      _db.execute('''
+        UPDATE obstacles 
+        SET report_count = report_count + 1,
+            synced_at = ?
+        WHERE id = ?
+      ''', [DateTime.now().millisecondsSinceEpoch, obstacleId]);
+      logDebug('Incremented report count for obstacle: $obstacleId');
+    } catch (e, stackTrace) {
+      logError('Failed to increment report count for: $obstacleId',
+          error: e, stackTrace: stackTrace);
     }
   }
 }

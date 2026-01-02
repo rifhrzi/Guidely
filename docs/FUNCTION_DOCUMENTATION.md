@@ -705,3 +705,5 @@ Representasi koordinat geografis.
 
 *Dokumentasi ini dibuat untuk NavMate v1.0 - Aplikasi Navigasi Kampus untuk Tunanetra*
 
+
+

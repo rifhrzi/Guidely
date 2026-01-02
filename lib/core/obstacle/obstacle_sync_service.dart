@@ -165,7 +165,11 @@ class ObstacleSyncService {
 
   /// Report a new obstacle (online only).
   ///
-  /// Returns the ID of the created obstacle, or null if failed.
+  /// If an obstacle already exists within 5 meters of the reported location,
+  /// the existing obstacle's report count is incremented instead of creating
+  /// a duplicate. This prevents spam reports for the same location.
+  ///
+  /// Returns the ID of the created or updated obstacle, or null if failed.
   Future<String?> reportObstacle({
     required String name,
     required String description,
@@ -181,6 +185,28 @@ class ObstacleSyncService {
     }
 
     try {
+      // Check for existing obstacle within 5 meters to prevent duplicates
+      final existingObstacle = store.findNearbyActiveObstacle(lat, lng);
+      
+      if (existingObstacle != null) {
+        // Increment report count on existing obstacle instead of creating new
+        logInfo('Found existing obstacle ${existingObstacle.id} within 5m, '
+            'incrementing report count');
+        
+        // Update in Firebase
+        await _obstaclesRef.doc(existingObstacle.id).update({
+          'report_count': FieldValue.increment(1),
+        });
+        
+        // Update locally
+        store.incrementReportCount(existingObstacle.id);
+        
+        logInfo('Incremented report count for obstacle: ${existingObstacle.id} '
+            '(now ${existingObstacle.reportCount + 1} reports)');
+        return existingObstacle.id;
+      }
+
+      // No existing obstacle nearby, create new one
       final docRef = await _obstaclesRef.add({
         'name': name,
         'description': description,
@@ -192,6 +218,7 @@ class ObstacleSyncService {
         'expires_at': expiresAt != null ? Timestamp.fromDate(expiresAt) : null,
         'is_active': true,
         'reported_by': 'user', // TODO: Add user ID when auth is implemented
+        'report_count': 1,
       });
 
       logInfo('Reported new obstacle: ${docRef.id}');

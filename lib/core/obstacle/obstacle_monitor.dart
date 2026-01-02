@@ -174,19 +174,36 @@ class ObstacleMonitor {
   ) {
     final distanceText = distance.round().toString();
     final typeText = obstacle.type.displayName;
+    
+    // For obstacles with multiple reports, mention the count
+    final reportInfo = obstacle.hasMultipleReports 
+        ? ' (${obstacle.reportCount} laporan)'
+        : '';
 
     switch (level) {
       case _WarningLevel.danger:
+        if (obstacle.hasMultipleReports) {
+          return 'Perhatian! Area dengan ${obstacle.reportCount} laporan '
+              '$typeText dalam $distanceText meter.';
+        }
         return 'Perhatian! $typeText dalam $distanceText meter. '
             '${obstacle.name}. ${obstacle.description}';
 
       case _WarningLevel.warning:
+        if (obstacle.hasMultipleReports) {
+          return 'Peringatan. Ada ${obstacle.reportCount} laporan $typeText '
+              'dalam $distanceText meter.';
+        }
         return 'Peringatan. Ada $typeText ${obstacle.name} '
             'dalam $distanceText meter. ${obstacle.description}';
 
       case _WarningLevel.alert:
+        if (obstacle.hasMultipleReports) {
+          return 'Informasi. ${obstacle.reportCount} laporan $typeText terdeteksi '
+              '$distanceText meter di depan.';
+        }
         return 'Informasi. $typeText ${obstacle.name} terdeteksi '
-            '$distanceText meter di depan.';
+            '$distanceText meter di depan.$reportInfo';
 
       case _WarningLevel.none:
         return '';
