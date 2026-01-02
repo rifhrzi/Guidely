@@ -106,8 +106,11 @@ class ObstacleSyncService {
 
       logInfo('Synced ${obstacles.length} obstacles from Firebase');
     } catch (e, stackTrace) {
-      logError('Failed to sync obstacles from Firebase',
-          error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to sync obstacles from Firebase',
+        error: e,
+        stackTrace: stackTrace,
+      );
     } finally {
       _isSyncing = false;
     }
@@ -122,13 +125,13 @@ class ObstacleSyncService {
         .where('is_active', isEqualTo: true)
         .snapshots()
         .listen(
-      (snapshot) {
-        _handleRealtimeUpdate(snapshot);
-      },
-      onError: (error) {
-        logError('Real-time sync error: $error');
-      },
-    );
+          (snapshot) {
+            _handleRealtimeUpdate(snapshot);
+          },
+          onError: (error) {
+            logError('Real-time sync error: $error');
+          },
+        );
   }
 
   /// Stop real-time sync.
@@ -187,22 +190,26 @@ class ObstacleSyncService {
     try {
       // Check for existing obstacle within 5 meters to prevent duplicates
       final existingObstacle = store.findNearbyActiveObstacle(lat, lng);
-      
+
       if (existingObstacle != null) {
         // Increment report count on existing obstacle instead of creating new
-        logInfo('Found existing obstacle ${existingObstacle.id} within 5m, '
-            'incrementing report count');
-        
+        logInfo(
+          'Found existing obstacle ${existingObstacle.id} within 5m, '
+          'incrementing report count',
+        );
+
         // Update in Firebase
         await _obstaclesRef.doc(existingObstacle.id).update({
           'report_count': FieldValue.increment(1),
         });
-        
+
         // Update locally
         store.incrementReportCount(existingObstacle.id);
-        
-        logInfo('Incremented report count for obstacle: ${existingObstacle.id} '
-            '(now ${existingObstacle.reportCount + 1} reports)');
+
+        logInfo(
+          'Incremented report count for obstacle: ${existingObstacle.id} '
+          '(now ${existingObstacle.reportCount + 1} reports)',
+        );
         return existingObstacle.id;
       }
 
@@ -237,16 +244,17 @@ class ObstacleSyncService {
     }
 
     try {
-      await _obstaclesRef.doc(obstacleId).update({
-        'is_active': false,
-      });
+      await _obstaclesRef.doc(obstacleId).update({'is_active': false});
 
       store.delete(obstacleId);
       logInfo('Deactivated obstacle: $obstacleId');
       return true;
     } catch (e, stackTrace) {
-      logError('Failed to deactivate obstacle: $obstacleId',
-          error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to deactivate obstacle: $obstacleId',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }
@@ -257,4 +265,3 @@ class ObstacleSyncService {
     _isInitialized = false;
   }
 }
-

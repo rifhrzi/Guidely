@@ -30,7 +30,11 @@ class ObstacleStore {
       _instance = store;
       return store;
     } catch (e, stackTrace) {
-      logError('Failed to open obstacle database', error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to open obstacle database',
+        error: e,
+        stackTrace: stackTrace,
+      );
       rethrow;
     }
   }
@@ -57,7 +61,9 @@ class ObstacleStore {
 
     // Migration: Add report_count column if it doesn't exist
     try {
-      _db.execute('ALTER TABLE obstacles ADD COLUMN report_count INTEGER DEFAULT 1');
+      _db.execute(
+        'ALTER TABLE obstacles ADD COLUMN report_count INTEGER DEFAULT 1',
+      );
       logDebug('Added report_count column to obstacles table');
     } catch (e) {
       // Column already exists, ignore
@@ -78,46 +84,14 @@ class ObstacleStore {
   /// Insert or update an obstacle.
   void upsert(Obstacle obstacle) {
     try {
-      _db.execute('''
+      _db.execute(
+        '''
         INSERT OR REPLACE INTO obstacles 
         (id, name, description, lat, lng, radius_meters, type, 
          reported_at, expires_at, is_active, reported_by, synced_at, report_count)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      ''', [
-        obstacle.id,
-        obstacle.name,
-        obstacle.description,
-        obstacle.lat,
-        obstacle.lng,
-        obstacle.radiusMeters,
-        obstacle.type.code,
-        obstacle.reportedAt.millisecondsSinceEpoch,
-        obstacle.expiresAt?.millisecondsSinceEpoch,
-        obstacle.isActive ? 1 : 0,
-        obstacle.reportedBy,
-        DateTime.now().millisecondsSinceEpoch,
-        obstacle.reportCount,
-      ]);
-      logDebug('Upserted obstacle: ${obstacle.id}');
-    } catch (e, stackTrace) {
-      logError('Failed to upsert obstacle: ${obstacle.id}',
-          error: e, stackTrace: stackTrace);
-    }
-  }
-
-  /// Insert or update multiple obstacles (batch operation).
-  void upsertAll(List<Obstacle> obstacles) {
-    if (obstacles.isEmpty) return;
-
-    try {
-      _db.execute('BEGIN TRANSACTION');
-      for (final obstacle in obstacles) {
-        _db.execute('''
-          INSERT OR REPLACE INTO obstacles 
-          (id, name, description, lat, lng, radius_meters, type, 
-           reported_at, expires_at, is_active, reported_by, synced_at, report_count)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', [
+      ''',
+        [
           obstacle.id,
           obstacle.name,
           obstacle.description,
@@ -131,13 +105,58 @@ class ObstacleStore {
           obstacle.reportedBy,
           DateTime.now().millisecondsSinceEpoch,
           obstacle.reportCount,
-        ]);
+        ],
+      );
+      logDebug('Upserted obstacle: ${obstacle.id}');
+    } catch (e, stackTrace) {
+      logError(
+        'Failed to upsert obstacle: ${obstacle.id}',
+        error: e,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  /// Insert or update multiple obstacles (batch operation).
+  void upsertAll(List<Obstacle> obstacles) {
+    if (obstacles.isEmpty) return;
+
+    try {
+      _db.execute('BEGIN TRANSACTION');
+      for (final obstacle in obstacles) {
+        _db.execute(
+          '''
+          INSERT OR REPLACE INTO obstacles 
+          (id, name, description, lat, lng, radius_meters, type, 
+           reported_at, expires_at, is_active, reported_by, synced_at, report_count)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''',
+          [
+            obstacle.id,
+            obstacle.name,
+            obstacle.description,
+            obstacle.lat,
+            obstacle.lng,
+            obstacle.radiusMeters,
+            obstacle.type.code,
+            obstacle.reportedAt.millisecondsSinceEpoch,
+            obstacle.expiresAt?.millisecondsSinceEpoch,
+            obstacle.isActive ? 1 : 0,
+            obstacle.reportedBy,
+            DateTime.now().millisecondsSinceEpoch,
+            obstacle.reportCount,
+          ],
+        );
       }
       _db.execute('COMMIT');
       logInfo('Batch upserted ${obstacles.length} obstacles');
     } catch (e, stackTrace) {
       _db.execute('ROLLBACK');
-      logError('Failed to batch upsert obstacles', error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to batch upsert obstacles',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -147,7 +166,11 @@ class ObstacleStore {
       _db.execute('DELETE FROM obstacles WHERE id = ?', [id]);
       logDebug('Deleted obstacle: $id');
     } catch (e, stackTrace) {
-      logError('Failed to delete obstacle: $id', error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to delete obstacle: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -157,7 +180,11 @@ class ObstacleStore {
       _db.execute('DELETE FROM obstacles');
       logInfo('Deleted all obstacles');
     } catch (e, stackTrace) {
-      logError('Failed to delete all obstacles', error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to delete all obstacles',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -165,15 +192,22 @@ class ObstacleStore {
   List<Obstacle> getActiveObstacles() {
     final now = DateTime.now().millisecondsSinceEpoch;
     try {
-      final result = _db.select('''
+      final result = _db.select(
+        '''
         SELECT * FROM obstacles 
         WHERE is_active = 1 
         AND (expires_at IS NULL OR expires_at > ?)
         ORDER BY reported_at DESC
-      ''', [now]);
+      ''',
+        [now],
+      );
       return result.map(_rowToObstacle).toList();
     } catch (e, stackTrace) {
-      logError('Failed to get active obstacles', error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to get active obstacles',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return [];
     }
   }
@@ -195,7 +229,11 @@ class ObstacleStore {
   ///
   /// [lat] and [lng] are the center coordinates.
   /// [radiusMeters] is the search radius in meters.
-  List<Obstacle> getObstaclesNearby(double lat, double lng, double radiusMeters) {
+  List<Obstacle> getObstaclesNearby(
+    double lat,
+    double lng,
+    double radiusMeters,
+  ) {
     // Convert radius to approximate degree delta for bounding box
     // 1 degree ≈ 111km at equator
     final radiusKm = radiusMeters / 1000.0;
@@ -205,19 +243,16 @@ class ObstacleStore {
 
     try {
       // First filter by bounding box (fast)
-      final result = _db.select('''
+      final result = _db.select(
+        '''
         SELECT * FROM obstacles
         WHERE is_active = 1
         AND (expires_at IS NULL OR expires_at > ?)
         AND lat BETWEEN ? AND ?
         AND lng BETWEEN ? AND ?
-      ''', [
-        now,
-        lat - delta,
-        lat + delta,
-        lng - delta,
-        lng + delta,
-      ]);
+      ''',
+        [now, lat - delta, lat + delta, lng - delta, lng + delta],
+      );
 
       // Then filter by actual distance (accurate)
       final center = LatLng(lat, lng);
@@ -227,7 +262,11 @@ class ObstacleStore {
         return distance <= radiusMeters + obstacle.radiusMeters;
       }).toList();
     } catch (e, stackTrace) {
-      logError('Failed to get nearby obstacles', error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to get nearby obstacles',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return [];
     }
   }
@@ -242,7 +281,11 @@ class ObstacleStore {
       if (result.isEmpty) return null;
       return _rowToObstacle(result.first);
     } catch (e, stackTrace) {
-      logError('Failed to get obstacle by id: $id', error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to get obstacle by id: $id',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return null;
     }
   }
@@ -261,11 +304,14 @@ class ObstacleStore {
   int getActiveCount() {
     final now = DateTime.now().millisecondsSinceEpoch;
     try {
-      final result = _db.select('''
+      final result = _db.select(
+        '''
         SELECT COUNT(*) as count FROM obstacles 
         WHERE is_active = 1 
         AND (expires_at IS NULL OR expires_at > ?)
-      ''', [now]);
+      ''',
+        [now],
+      );
       return result.first['count'] as int;
     } catch (e) {
       return 0;
@@ -296,7 +342,9 @@ class ObstacleStore {
       lng: row['lng'] as double,
       radiusMeters: row['radius_meters'] as double? ?? 5.0,
       type: ObstacleType.fromCode(row['type'] as String),
-      reportedAt: DateTime.fromMillisecondsSinceEpoch(row['reported_at'] as int),
+      reportedAt: DateTime.fromMillisecondsSinceEpoch(
+        row['reported_at'] as int,
+      ),
       expiresAt: row['expires_at'] != null
           ? DateTime.fromMillisecondsSinceEpoch(row['expires_at'] as int)
           : null,
@@ -359,17 +407,22 @@ class ObstacleStore {
   /// in the same location (within 5m).
   void incrementReportCount(String obstacleId) {
     try {
-      _db.execute('''
+      _db.execute(
+        '''
         UPDATE obstacles 
         SET report_count = report_count + 1,
             synced_at = ?
         WHERE id = ?
-      ''', [DateTime.now().millisecondsSinceEpoch, obstacleId]);
+      ''',
+        [DateTime.now().millisecondsSinceEpoch, obstacleId],
+      );
       logDebug('Incremented report count for obstacle: $obstacleId');
     } catch (e, stackTrace) {
-      logError('Failed to increment report count for: $obstacleId',
-          error: e, stackTrace: stackTrace);
+      logError(
+        'Failed to increment report count for: $obstacleId',
+        error: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 }
-
