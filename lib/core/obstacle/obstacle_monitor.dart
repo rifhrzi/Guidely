@@ -8,10 +8,8 @@ import 'obstacle.dart';
 import 'obstacle_store.dart';
 
 /// Callback type for obstacle proximity events.
-typedef ObstacleProximityCallback = void Function(
-  Obstacle obstacle,
-  double distanceMeters,
-);
+typedef ObstacleProximityCallback =
+    void Function(Obstacle obstacle, double distanceMeters);
 
 /// Monitors user's proximity to obstacles and announces warnings via TTS.
 ///
@@ -33,7 +31,7 @@ class ObstacleMonitor {
   final ObstacleStore store;
   final TtsService tts;
   final HapticsService haptics;
-  
+
   /// Callback when an obstacle is nearby.
   final ObstacleProximityCallback? onObstacleNearby;
 
@@ -101,12 +99,11 @@ class ObstacleMonitor {
   /// Get all obstacles that are currently being tracked (within alert range).
   List<Obstacle> getTrackedObstacles(LatLng position) {
     if (!enabled) return [];
-    
-    return store.getObstaclesNearby(
-      position.lat,
-      position.lng,
-      alertRadiusMeters,
-    ).where((o) => o.shouldShow).toList();
+
+    return store
+        .getObstaclesNearby(position.lat, position.lng, alertRadiusMeters)
+        .where((o) => o.shouldShow)
+        .toList();
   }
 
   /// Determine the warning level based on distance.
@@ -156,7 +153,9 @@ class ObstacleMonitor {
     // Build announcement message
     final message = _buildAnnouncementMessage(obstacle, distance, level);
 
-    logInfo('Obstacle warning ($level): ${obstacle.name} at ${distance.round()}m');
+    logInfo(
+      'Obstacle warning ($level): ${obstacle.name} at ${distance.round()}m',
+    );
 
     // Play haptic feedback based on warning level
     await _playHapticFeedback(level);
@@ -174,9 +173,9 @@ class ObstacleMonitor {
   ) {
     final distanceText = distance.round().toString();
     final typeText = obstacle.type.displayName;
-    
+
     // For obstacles with multiple reports, mention the count
-    final reportInfo = obstacle.hasMultipleReports 
+    final reportInfo = obstacle.hasMultipleReports
         ? ' (${obstacle.reportCount} laporan)'
         : '';
 
@@ -254,9 +253,8 @@ class ObstacleMonitor {
 
 /// Warning levels for obstacle proximity.
 enum _WarningLevel {
-  none,   // Outside alert range
-  alert,  // Far - informational
+  none, // Outside alert range
+  alert, // Far - informational
   warning, // Getting closer - caution
-  danger,  // Very close - immediate attention
+  danger, // Very close - immediate attention
 }
-
