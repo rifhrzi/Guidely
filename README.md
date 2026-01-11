@@ -16,6 +16,11 @@ Clean Flutter app scaffold for NavMate.
 - Generated/IDE files are ignored via `.gitignore`.
 - Lints: `analysis_options.yaml` uses `flutter_lints`.
 
+## Feature Implementations
+- Dijkstra pathfinding: walkway graph is built and routed via `computeWalkwayPath()` → `_dijkstraOptimized()` in `lib/core/routing/pathfinder.dart`.
+- Tactile feedback: `DeviceHaptics` implements ticks/confirm/warning/danger patterns in `lib/core/haptics/haptics_service.dart` and is injected through `AppServices` for use across screens.
+- Voice control: speech-to-text handling lives in `RealStt.listenOnce()` in `lib/core/speech/stt_service.dart`, used by the voice destination flow in `lib/features/destination/voice_destination_page.dart` (auto-start listening + haptics/audio cues).
+
 ## Campus Map Strategy (University Only)
 - Custom graph: Build a walkable-path graph (nodes/edges) for campus with accessibility tags (stairs, ramps). Embed as an asset and route offline via A*.
 - Offline basemap (optional): Use `MBTiles` raster tiles rendered from your campus data for `flutter_map`, or MapLibre with a custom style. Blind users rely on voice/haptics, so map is secondary.
